@@ -1,28 +1,28 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import axios from 'axios'
-// import {Redirect} from 'react-router-dom';
+import axios from "axios/index";
+
+// import AddDoorForm from '../src/components/AddDoorForm'
+// import DoorList from '../src/components/DoorList'
+//
+
+
+
+import Bootstrap from 'react-bootstrap'
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-          <Door></Door>
-          <DoorList></DoorList>
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div className="jumbotron">
+                <AddDoorForm/>
+                <DoorList/>
+            </div>
+        );
+    }
 }
 
-class Door extends React.Component {
+
+class AddDoorForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -46,10 +46,10 @@ class Door extends React.Component {
         this.setState({name: event.target.value});
     }
 
-     async handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
         try{
-           await  axios.post("http://localhost:8080/api/addDoor", this.state)
+            await  axios.post("http://localhost:8080/api/addDoor", this.state)
                 .then( response => {
                     console.log('response', response)
                     const newDoor = response.data
@@ -63,61 +63,83 @@ class Door extends React.Component {
         }
     }
 
-    render() {
+    render(){
 
         return (
+            // <div class="form-group">
             <form onSubmit={this.handleSubmit}>
                 <h2>Please create a dock door name to add to the current list.</h2>
                 <label>
-                     Name:
-                    <input type="text" value={this.state.name} placeholder="Door Name" onChange={this.handleChange} />
-                 </label>
+                    Name:
+                    <input type="text" className="form-control" value={this.state.name} placeholder="Door Name" onChange={this.handleChange} />
+                </label>
 
-                <input type="submit" value="Submit" />
+                <button type="submit" value="Submit" class="btn btn-primary"/>
             </form>
+            // </div>
         );
     }
 }
 
-class DoorList extends Component{
-    constructor(props){
+class DoorList extends React.Component {
+
+    constructor(props) {
         super(props);
         this.state = {
-            Doors: [],
+            doors: [],
         };
     }
 
     getAllDoors = async () => {
 
         try {
-          const response = await axios.get("http://localhost:8080/api/getAllDoors");
-            const doors = await response.data
-            this.setState({Doors: doors})
-        } catch (error){
+            const response = await axios.get("http://localhost:8080/api/getAllDoors");
+            const doors = await response.data;
+            console.log(doors);
+            this.setState({doors: doors})
+        } catch (error) {
             console.log('Error: ', error)
         }
 
     };
 
-    componentDidMount() {
+    componentDidMount(){
         this.getAllDoors();
     }
 
 
     render(){
-        const doorList = this.state.Doors.map((door, i) => {
-            return (
-                <h2 key={i}>Door name: {door.name} Door ID: {door.id} </h2>
-            )
-        });
         return (
-        <div>
-            <ul>
-                {doorList}
-                {/*{this.state.Doors}*/}
-            </ul>
-        </div>
-    )};
+            <div>
+                <h1>Doors List</h1>
+
+                <table width="100%">
+                    <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <th>ID</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            {this.state.doors.map((door, index) => {
+                                return (<h5 key={index}> {door.name}</h5>)
+                            })}
+                        </td>
+
+                        <td>
+                            {this.state.doors.map((door, i) => {
+                                return (<h5 key={i}> {door.id} </h5>)
+                            })}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        );
+    }
 }
 
 export default App;
+
+
